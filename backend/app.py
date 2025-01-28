@@ -23,13 +23,14 @@ class Match(db.Model):
     team2_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=False)
     date = db.Column(db.String(50), nullable=False)
 
-db.create_all()
+# Uncomment this line to create the database (first-time setup)
+# db.create_all()
 
 @app.route('/teams', methods=['GET', 'POST'])
 def manage_teams():
     if request.method == 'GET':
         teams = Team.query.all()
-        return jsonify([team.name for team in teams])
+        return jsonify([{'id': team.id, 'name': team.name} for team in teams])  # Include ID for better management
     elif request.method == 'POST':
         data = request.json
         new_team = Team(name=data['name'])
@@ -41,7 +42,7 @@ def manage_teams():
 def manage_players():
     if request.method == 'GET':
         players = Player.query.all()
-        return jsonify([{'name': player.name, 'team': player.team.name} for player in players])
+        return jsonify([{'id': player.id, 'name': player.name, 'team': player.team.name} for player in players])  # Include ID for better management
     elif request.method == 'POST':
         data = request.json
         team = Team.query.filter_by(name=data['team']).first()
@@ -56,7 +57,7 @@ def manage_players():
 def manage_matches():
     if request.method == 'GET':
         matches = Match.query.all()
-        return jsonify([{'team1': match.team1.name, 'team2': match.team2.name, 'date': match.date} for match in matches])
+        return jsonify([{'id': match.id, 'team1': match.team1.name, 'team2': match.team2.name, 'date': match.date} for match in matches])  # Include ID for better management
     elif request.method == 'POST':
         data = request.json
         team1 = Team.query.filter_by(name=data['team1']).first()

@@ -33,91 +33,105 @@
     <ul id="matches-list"></ul>
 
     <script>
-        const apiUrl = 'http://<API_URL>';
+        const apiUrl = 'http://<API_URL>';  // Replace with actual API URL
 
+        // Function to fetch teams from the API
         function fetchTeams() {
             fetch(`${apiUrl}/teams`)
                 .then(response => response.json())
                 .then(data => {
                     const list = document.getElementById('teams-list');
-                    list.innerHTML = '';
+                    list.innerHTML = ''; // Clear the list before adding new items
                     data.forEach(team => {
                         const li = document.createElement('li');
-                        li.innerText = team;
+                        li.innerText = team.name; // Assuming team object has a 'name' property
                         list.appendChild(li);
                     });
                 });
         }
 
+        // Function to fetch players from the API
         function fetchPlayers() {
             fetch(`${apiUrl}/players`)
                 .then(response => response.json())
                 .then(data => {
                     const list = document.getElementById('players-list');
-                    list.innerHTML = '';
+                    list.innerHTML = ''; // Clear the list before adding new items
                     data.forEach(player => {
                         const li = document.createElement('li');
-                        li.innerText = `${player.name} (${player.team})`;
+                        li.innerText = `${player.name} (${player.team})`; // Assuming player object has 'name' and 'team' properties
                         list.appendChild(li);
                     });
                 });
         }
 
+        // Function to fetch matches from the API
         function fetchMatches() {
             fetch(`${apiUrl}/matches`)
                 .then(response => response.json())
                 .then(data => {
                     const list = document.getElementById('matches-list');
-                    list.innerHTML = '';
+                    list.innerHTML = ''; // Clear the list before adding new items
                     data.forEach(match => {
                         const li = document.createElement('li');
-                        li.innerText = `${match.team1} vs ${match.team2} on ${match.date}`;
+                        li.innerText = `${match.team1} vs ${match.team2} on ${match.date}`; // Assuming match object has 'team1', 'team2', and 'date' properties
                         list.appendChild(li);
                     });
                 });
         }
 
+        // Function to add a team and update the list
         function addTeam() {
             const teamName = document.getElementById('team-name').value;
-            fetch(`${apiUrl}/teams`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: teamName })
-            })
-            .then(response => response.json())
-            .then(() => {
-                fetchTeams();
-            });
+            if (teamName) {
+                fetch(`${apiUrl}/teams`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: teamName })
+                })
+                .then(response => response.json())
+                .then(() => {
+                    fetchTeams();  // Re-fetch and update the teams list
+                });
+            }
         }
 
+        // Function to add a player and update the list
         function addPlayer() {
             const playerName = document.getElementById('player-name').value;
             const teamName = document.getElementById('player-team').value;
-            fetch(`${apiUrl}/players`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: playerName, team: teamName })
-            })
-            .then(response => response.json())
-            .then(() => {
-                fetchPlayers();
-            });
+            if (playerName && teamName) {
+                fetch(`${apiUrl}/players`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: playerName, team: teamName })
+                })
+                .then(response => response.json())
+                .then(() => {
+                    fetchPlayers();  // Re-fetch and update the players list
+                });
+            }
         }
+
+        // Function to add a match and update the list
         function addMatch() {
             const team1 = document.getElementById('match-team1').value;
             const team2 = document.getElementById('match-team2').value;
             const date = document.getElementById('match-date').value;
-            fetch(`${apiUrl}/matches`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ team1: team1, team2: team2, date: date })
-            })
-            .then(response => response.json())
-            .then(() => {
-                fetchMatches();
-            });
+            if (team1 && team2 && date) {
+                fetch(`${apiUrl}/matches`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ team1: team1, team2: team2, date: date })
+                })
+                .then(response => response.json())
+                .then(() => {
+                    fetchMatches();  // Re-fetch and update the matches list
+                });
+            }
         }
 
+        // Initially fetch and display the data
         fetchTeams();
         fetchPlayers();
         fetchMatches();
