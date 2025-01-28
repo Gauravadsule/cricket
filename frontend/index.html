@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cricket Entry Application</title>
+</head>
+<body>
+    <h1>Cricket Entry Application</h1>
+
+    <h2>Add Team</h2>
+    <input type="text" id="team-name" placeholder="Enter Team Name">
+    <button onclick="addTeam()">Add Team</button>
+    
+    <h2>Add Player</h2>
+    <input type="text" id="player-name" placeholder="Enter Player Name">
+    <input type="text" id="player-team" placeholder="Enter Team Name">
+    <button onclick="addPlayer()">Add Player</button>
+
+    <h2>Add Match</h2>
+    <input type="text" id="match-team1" placeholder="Enter Team 1 Name">
+    <input type="text" id="match-team2" placeholder="Enter Team 2 Name">
+    <input type="text" id="match-date" placeholder="Enter Match Date">
+    <button onclick="addMatch()">Add Match</button>
+
+    <h2>Teams</h2>
+    <ul id="teams-list"></ul>
+
+    <h2>Players</h2>
+    <ul id="players-list"></ul>
+
+    <h2>Matches</h2>
+    <ul id="matches-list"></ul>
+
+    <script>
+        const apiUrl = 'http://<API_URL>';
+
+        function fetchTeams() {
+            fetch(`${apiUrl}/teams`)
+                .then(response => response.json())
+                .then(data => {
+                    const list = document.getElementById('teams-list');
+                    list.innerHTML = '';
+                    data.forEach(team => {
+                        const li = document.createElement('li');
+                        li.innerText = team;
+                        list.appendChild(li);
+                    });
+                });
+        }
+
+        function fetchPlayers() {
+            fetch(`${apiUrl}/players`)
+                .then(response => response.json())
+                .then(data => {
+                    const list = document.getElementById('players-list');
+                    list.innerHTML = '';
+                    data.forEach(player => {
+                        const li = document.createElement('li');
+                        li.innerText = `${player.name} (${player.team})`;
+                        list.appendChild(li);
+                    });
+                });
+        }
+
+        function fetchMatches() {
+            fetch(`${apiUrl}/matches`)
+                .then(response => response.json())
+                .then(data => {
+                    const list = document.getElementById('matches-list');
+                    list.innerHTML = '';
+                    data.forEach(match => {
+                        const li = document.createElement('li');
+                        li.innerText = `${match.team1} vs ${match.team2} on ${match.date}`;
+                        list.appendChild(li);
+                    });
+                });
+        }
+
+        function addTeam() {
+            const teamName = document.getElementById('team-name').value;
+            fetch(`${apiUrl}/teams`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: teamName })
+            })
+            .then(response => response.json())
+            .then(() => {
+                fetchTeams();
+            });
+        }
+
+        function addPlayer() {
+            const playerName = document.getElementById('player-name').value;
+            const teamName = document.getElementById('player-team').value;
+            fetch(`${apiUrl}/players`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: playerName, team: teamName })
+            })
+            .then(response => response.json())
+            .then(() => {
+                fetchPlayers();
+            });
+        }
+        function addMatch() {
+            const team1 = document.getElementById('match-team1').value;
+            const team2 = document.getElementById('match-team2').value;
+            const date = document.getElementById('match-date').value;
+            fetch(`${apiUrl}/matches`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ team1: team1, team2: team2, date: date })
+            })
+            .then(response => response.json())
+            .then(() => {
+                fetchMatches();
+            });
+        }
+
+        fetchTeams();
+        fetchPlayers();
+        fetchMatches();
+    </script>
+</body>
+</html>
